@@ -405,12 +405,6 @@ void setup(void)
   digitalWrite(SD_pin, HIGH);
   pinMode(w_mode, INPUT_PULLUP); //working mode Pin
 
-  tft.begin();
-  tft.setRotation(3);  // landscape
-  tft.fillScreen(random(0xFFFF));
-
-  Serial.print(F("Initializing SD card..."));
-  
   //see if the card is present and can be initialised.
   //Note: Using the ESP32 and SD_Card readers requires a 1K to 4K7 pull-up to 3v3 on the MISO line, otherwise may not work
   if (!SD.begin())
@@ -424,12 +418,25 @@ void setup(void)
     SD_present = true; 
   }
 
-  Serial.println(F("Press Button to initialize images server"));
+  tft.begin();
+  tft.fillScreen(TFT_WHITE);
+  tft.setCursor(0, 0, 2);
+  tft.setTextColor(TFT_BLACK, TFT_WHITE);
+  tft.setTextSize(2);
+  tft.println("Iniciando...");
+  File file =  SD.open("/dino.jpg");
+  drawSdJpeg(file.path(), 150, 0);     // This draws a jpeg pulled off the SD Card
   delay(3000);
+  tft.setTextSize(1);
+  tft.println("Presiona para iniciar servidor web y editar fotos que quieres desplegar");
+  tft.setRotation(3);
+  Serial.print(F("Initializing SD card..."));
+  Serial.println(F("Press Button to initialize images server"));
+  delay(5000);
 
   if (!digitalRead(w_mode))
   {
-    //Server    
+    //Server
     WiFi.softAP("ESP32 Images Server", "12345678"); //Network and password for the access point genereted by ESP32
     
     //Set your preferred server name, if you use "mcserver" the address would be http://mcserver.local/
