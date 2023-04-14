@@ -11,9 +11,9 @@
 ESP32WebServer server(80);
 TFT_eSPI tft = TFT_eSPI();
 
-#define servername "testserver"
+#define servername "imageserver"
 #define SD_pin GPIO_NUM_5
-#define w_mode GPIO_NUM_21
+#define w_mode GPIO_NUM_22
 
 bool SD_present = false; //Controls if the SD card is present or not
 
@@ -126,11 +126,11 @@ void drawSdJpeg(const char *filename, int xpos, int ypos) {
 void File_Upload()
 {
   append_page_header();
-  webpage += F("<h3>Select File to Upload</h3>"); 
+  webpage += F("<h3>Seleccionar archivo</h3>"); 
   webpage += F("<FORM action='/fupload' method='post' enctype='multipart/form-data'>");
-  webpage += F("<input class='buttons' style='width:25%' type='file' name='fupload' id = 'fupload' value=''>");
-  webpage += F("<button class='buttons' style='width:10%' type='submit'>Upload File</button><br><br>");
-  webpage += F("<a href='/'>[Back]</a><br><br>");
+  webpage += F("<input class='buttons' style='width:75%' type='file' name='fupload' id = 'fupload' value=''><br><br>");
+  webpage += F("<button class='buttons' style='width:25%' type='submit'>Agregar</button><br><br>");
+  webpage += F("<a href='/'>[Regresar]</a><br><br>");
   append_page_footer();
   server.send(200, "text/html",webpage);
 }
@@ -166,8 +166,8 @@ void SendHTML_Stop()
 void ReportSDNotPresent()
 {
   SendHTML_Header();
-  webpage += F("<h3>No SD Card present</h3>"); 
-  webpage += F("<a href='/'>[Back]</a><br><br>");
+  webpage += F("<h3>No hay tarjeta SD</h3>"); 
+  webpage += F("<a href='/'>[Regresar]</a><br><br>");
   append_page_footer();
   SendHTML_Content();
   SendHTML_Stop();
@@ -177,8 +177,8 @@ void ReportSDNotPresent()
 void ReportFileNotPresent(String target)
 {
   SendHTML_Header();
-  webpage += F("<h3>File does not exist</h3>"); 
-  webpage += F("<a href='/"); webpage += target + "'>[Back]</a><br><br>";
+  webpage += F("<h3>Archivo no existe</h3>"); 
+  webpage += F("<a href='/"); webpage += target + "'>[Regresar]</a><br><br>";
   append_page_footer();
   SendHTML_Content();
   SendHTML_Stop();
@@ -188,8 +188,8 @@ void ReportFileNotPresent(String target)
 void ReportCouldNotCreateFile(String target)
 {
   SendHTML_Header();
-  webpage += F("<h3>Could Not Create Uploaded File (write-protected?)</h3>"); 
-  webpage += F("<a href='/"); webpage += target + "'>[Back]</a><br><br>";
+  webpage += F("<h3>No se pudo crear archivo</h3>"); 
+  webpage += F("<a href='/"); webpage += target + "'>[Regresar]</a><br><br>";
   append_page_footer();
   SendHTML_Content();
   SendHTML_Stop();
@@ -215,13 +215,13 @@ void printDirectory(const char * dirname, uint8_t levels)
       SendHTML_Content();
     }
     if(file.isDirectory()){
-      webpage += "<tr><td>"+String(file.isDirectory()?"Dir":"File")+"</td><td>"+String(file.name())+"</td><td></td></tr>";
+      webpage += "<tr><td>"+String(file.isDirectory()?"Carpeta":"Archivo")+"</td><td>"+String(file.name())+"</td><td></td></tr>";
       printDirectory(file.name(), levels-1);
     }
     else
     {
       webpage += "<tr><td>"+String(file.name())+"</td>";
-      webpage += "<td>"+String(file.isDirectory()?"Dir":"File")+"</td>";
+      webpage += "<td>"+String(file.isDirectory()?"Carpeta":"Archivo")+"</td>";
       int bytes = file.size();
       String fsize = "";
       if (bytes < 1024)                     fsize = String(bytes)+" B";
@@ -232,12 +232,12 @@ void printDirectory(const char * dirname, uint8_t levels)
       webpage += "<td>";
       webpage += F("<FORM action='/' method='post'>"); 
       webpage += F("<button type='submit' name='download'"); 
-      webpage += F("' value='"); webpage +="download_"+String(file.name()); webpage +=F("'>Download</button>");
+      webpage += F("' value='"); webpage +="download_"+String(file.name()); webpage +=F("'>Descargar</button>");
       webpage += "</td>";
       webpage += "<td>";
       webpage += F("<FORM action='/' method='post'>"); 
       webpage += F("<button type='submit' name='delete'"); 
-      webpage += F("' value='"); webpage +="delete_"+String(file.name()); webpage +=F("'>Delete</button>");
+      webpage += F("' value='"); webpage +="delete_"+String(file.name()); webpage +=F("'>Borrar</button>");
       webpage += "</td>";
       webpage += "</tr>";
 
@@ -307,10 +307,10 @@ void handleFileUpload()
       Serial.print("Upload Size: "); Serial.println(uploadfile.totalSize);
       webpage = "";
       append_page_header();
-      webpage += F("<h3>File was successfully uploaded</h3>"); 
-      webpage += F("<h2>Uploaded File Name: "); webpage += uploadfile.filename+"</h2>";
-      webpage += F("<h2>File Size: "); webpage += file_size(uploadfile.totalSize) + "</h2><br><br>"; 
-      webpage += F("<a href='/'>[Back]</a><br><br>");
+      webpage += F("<h3>Archivo agregado exitosamente</h3>"); 
+      webpage += F("<h2>Nombre de archivo: "); webpage += uploadfile.filename+"</h2>";
+      webpage += F("<h2>Tamanio de archivo: "); webpage += file_size(uploadfile.totalSize) + "</h2><br><br>"; 
+      webpage += F("<a href='/'>[Regresar]</a><br><br>");
       append_page_footer();
       server.send(200,"text/html",webpage);
     } 
@@ -331,13 +331,13 @@ void SD_file_delete(String filename)
     {
       if (SD.remove("/"+filename)) {
         Serial.println(F("File deleted successfully"));
-        webpage += "<h3>File '"+filename+"' has been erased</h3>"; 
-        webpage += F("<a href='/'>[Back]</a><br><br>");
+        webpage += "<h3>Archivo '"+filename+"' ha sido borrado</h3>"; 
+        webpage += F("<a href='/'>[Regresar]</a><br><br>");
       }
       else
       { 
-        webpage += F("<h3>File was not deleted - error</h3>");
-        webpage += F("<a href='/'>[Back]</a><br><br>");
+        webpage += F("<h3>Error - Archivo no ha sido borrado</h3>");
+        webpage += F("<a href='/'>[Regresar]</a><br><br>");
       }
     } else ReportFileNotPresent("delete");
     append_page_footer(); 
@@ -379,7 +379,7 @@ void SD_dir()
       root.rewindDirectory();
       SendHTML_Header();    
       webpage += F("<table align='center'>");
-      webpage += F("<tr><th>Name/Type</th><th style='width:20%'>Type File/Dir</th><th>File Size</th></tr>");
+      webpage += F("<tr><th>Nombre/Tipo</th><th style='width:20%'>Tipo/Carpeta</th><th>Tamanio archivo</th></tr>");
       printDirectory("/",0);
       webpage += F("</table>");
       SendHTML_Content();
@@ -388,7 +388,7 @@ void SD_dir()
     else 
     {
       SendHTML_Header();
-      webpage += F("<h3>No Files Found</h3>");
+      webpage += F("<h3>No se han encontrado archivos</h3>");
     }
     append_page_footer();
     SendHTML_Content();
@@ -429,10 +429,13 @@ void setup(void)
   delay(3000);
   tft.setTextSize(1);
   tft.println("Presiona para iniciar servidor web y editar fotos que quieres desplegar");
-  tft.setRotation(3);
+  delay(5000);
+  
+  tft.println("INICIADO");
+  tft.println("PARA REINICIAR, APAGA Y ENCIENDE EL DISPOSITVO");
   Serial.print(F("Initializing SD card..."));
   Serial.println(F("Press Button to initialize images server"));
-  delay(5000);
+
 
   if (!digitalRead(w_mode))
   {
@@ -454,6 +457,7 @@ void setup(void)
     server.begin();
     
   }
+  tft.setRotation(3);
 }
 
 /*********  LOOP  **********/
@@ -479,8 +483,18 @@ void loop(void)
   {
     if(!file.isDirectory())
     {
-      drawSdJpeg(file.path(), 0, 0);     // This draws a jpeg pulled off the SD Card
-      delay(4000);
+      
+      String file_path = file.path();
+      if(file_path.indexOf('R') > -1){
+        tft.setRotation(1);
+      } else{
+        tft.setRotation(3);
+      }
+      
+      if (file_path.indexOf("dino") == -1){
+        drawSdJpeg(file.path(), 0, 0);     // This draws a jpeg pulled off the SD Card
+        delay(5000);
+      }
     }
     file = root.openNextFile();  // Opens next file in root
   }

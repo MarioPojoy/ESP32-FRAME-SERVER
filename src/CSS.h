@@ -3,7 +3,7 @@ String webpage = ""; //String to save the html code
 void append_page_header() {
   webpage  = F("<!DOCTYPE html><html>");
   webpage += F("<head>");
-  webpage += F("<title>Test Server</title>"); // NOTE: 1em = 16px
+  webpage += F("<title>Images Server</title>"); // NOTE: 1em = 16px
   webpage += F("<meta name='viewport' content='user-scalable=yes,initial-scale=1.0,width=device-width'>");
   webpage += F("<style>");//From here style:
   webpage += F("body{max-width:65%;margin:0 auto;font-family:arial;font-size:100%;}");
@@ -25,10 +25,10 @@ void append_page_header() {
   webpage += F("*{box-sizing:border-box;}");
   webpage += F("a{font-size:75%;}");
   webpage += F("p{font-size:75%;}");
-  webpage += F("</style></head><body><h1>Test Server</h1>");
+  webpage += F("</style></head><body><h1>Images Server</h1>");
   webpage += F("<ul>");
-  webpage += F("<li><a href='/'>Files</a></li>"); //Menu bar with commands
-  webpage += F("<li><a href='/upload'>Upload</a></li>"); 
+  webpage += F("<li><a href='/'>Archivos</a></li>"); //Menu bar with commands
+  webpage += F("<li><a href='/upload'>Subir</a></li>"); 
   webpage += F("</ul>");
 }
 //Saves repeating many lines of code for HTML page footers
